@@ -1,0 +1,5 @@
+clinicius
+clinicius.exe
+*.test
+*.out
+coverage.out
