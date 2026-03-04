@@ -1,64 +1,133 @@
-# CLnicius
+# CLinicius
 
-> Opinionated architecture governance CLI for Go projects.\
-> Created by Vinicius Teixeira.
+> Architectural governance CLI for Go projects.
 
-**CLnicius** (CLI + Vinicius) is a static analysis tool designed to
-enforce architectural integrity in Go codebases.
+CLinicius enforces layer boundaries and detects cyclic dependencies in Go codebases — the things most linters quietly ignore.
 
-It focuses on something most linters ignore:
+```bash
+clinicius check ./...
+```
 
-**Architectural boundaries and dependency governance.**
+```
+❌ Architectural Violation
+  Layer:   handler
+  Package: myapp/internal/handler
+  Imports: myapp/internal/repository
+  Rule:    layer-boundary
+  Detail:  handler layer cannot depend on internal/repository
 
-------------------------------------------------------------------------
+1 violation(s) found.
+```
 
-## 🎯 Vision
+---
 
-As systems evolve, architectural erosion happens:
+## Installation
 
--   Handlers start importing repositories directly
--   Domain logic depends on infrastructure
--   Cycles appear between packages
--   Forbidden libraries leak into core layers
+### Prerequisites
 
-CLnicius exists to:
+Go 1.22+ must be installed. Download at [go.dev/dl](https://go.dev/dl).
 
--   Make architectural violations visible
--   Enforce boundaries automatically
--   Integrate into CI pipelines
--   Scale with growing backend systems
+### Build from source
 
-------------------------------------------------------------------------
+```bash
+git clone https://github.com/vtbarreto/CLinicius.git
+cd CLinicius
+go build -o clinicius .
+```
 
-## 🚀 What It Does
+Then move the binary to a directory in your `$PATH` (see below).
 
-CLnicius:
+---
 
--   Loads Go packages using module-aware resolution
--   Builds a dependency graph
--   Parses AST for accurate import detection
--   Applies rule engine validations
--   Reports structured architectural violations
+### Adding the binary to your PATH
 
-------------------------------------------------------------------------
+#### Linux and macOS
 
-## 📦 Features
+Move the binary to `/usr/local/bin` (requires sudo):
 
--   Layer boundary enforcement
--   Forbidden dependency detection
--   Cyclic dependency detection
--   YAML-configurable rules
--   CI-friendly exit codes
--   JSON output mode
--   Dependency graph export (DOT)
+```bash
+sudo mv clinicius /usr/local/bin/
+```
 
-------------------------------------------------------------------------
+Or install directly into your Go bin directory (no sudo needed):
 
-## 🔧 Example Configuration
+```bash
+go build -o ~/go/bin/clinicius .
+```
 
-`clnicius.yaml`
+Then make sure `~/go/bin` is in your PATH. Add this line to `~/.bashrc` (bash) or `~/.zshrc` (zsh):
 
-``` yaml
+```bash
+export PATH="$PATH:$HOME/go/bin"
+```
+
+Reload the shell:
+
+```bash
+source ~/.bashrc   # or source ~/.zshrc
+```
+
+Verify:
+
+```bash
+clinicius --help
+```
+
+#### Windows
+
+Build the binary:
+
+```powershell
+go build -o clinicius.exe .
+```
+
+Move it to a permanent location, for example `C:\tools\`:
+
+```powershell
+mkdir C:\tools
+move clinicius.exe C:\tools\
+```
+
+Add `C:\tools` to your system PATH:
+
+1. Open **Start** → search for **"Environment Variables"**
+2. Click **"Edit the system environment variables"**
+3. Click **Environment Variables...**
+4. Under **System variables**, select **Path** and click **Edit**
+5. Click **New** and add `C:\tools`
+6. Click **OK** on all dialogs
+
+Open a new terminal and verify:
+
+```powershell
+clinicius --help
+```
+
+---
+
+## Usage
+
+```bash
+# Check all packages in the current module
+clinicius check ./...
+
+# Use a custom config file
+clinicius check ./... --config path/to/clinicius.yaml
+
+# CI mode: exits with code 1 if violations are found
+clinicius check ./... --ci
+
+# JSON output for tooling integration
+clinicius check ./... --json
+```
+
+---
+
+## Configuration
+
+Create a `clinicius.yaml` at the root of your project and declare your layers:
+
+```yaml
 layers:
   - name: domain
     path: internal/domain
@@ -72,156 +141,66 @@ layers:
       - internal/repository
 ```
 
-------------------------------------------------------------------------
+Each layer entry maps a **path prefix** to a list of **forbidden imports**. Any package whose import path contains `path` that imports something containing a `forbid` entry is reported as a violation.
 
-## ▶ Running
+---
 
-``` bash
-clnicius check ./...
-```
+## Why CLinicius?
 
-### Output Example
+Architectural erosion is silent. Over time:
 
-``` text
-❌ Architectural Violation
+- Handlers start importing repositories directly
+- Domain logic grows dependencies on infrastructure
+- Cyclic imports between packages accumulate
 
-Layer: handler
-File: internal/handler/user.go
-Imports: internal/repository/user_repo.go
-Rule: handler layer cannot depend on repository layer
-```
+Standard linters (`golangci-lint`, `staticcheck`) don't catch this. CLinicius does.
 
-CI mode:
+---
 
-``` bash
-clnicius check ./... --ci
-```
+## Features
 
-Returns exit code `1` if violations exist.
+| Feature | Status |
+|---|---|
+| Layer boundary enforcement | ✅ |
+| Cyclic dependency detection | ✅ |
+| YAML-configurable rules | ✅ |
+| JSON output | ✅ |
+| CI-friendly exit codes | ✅ |
+| DOT graph export | 🔜 |
+| HTML report | 🔜 |
+| Plugin system | 🔜 |
 
-------------------------------------------------------------------------
+---
 
-## 🏗 Internal Architecture
+## How it works
 
-    cmd/
-        root.go
-        check.go
+1. Loads Go packages using `golang.org/x/tools/go/packages` (module-aware)
+2. Parses imports per file using `go/ast`
+3. Builds an in-memory directed graph
+4. Runs a rule engine over the graph
+5. Reports violations to stdout (console or JSON)
 
-    internal/
-        analyzer/
-            loader.go
-            graph.go
-            ast.go
-        rules/
-            engine.go
-            layer_rule.go
-            cycle_rule.go
-        reporter/
-            console.go
-            json.go
+The rule engine is built around a simple interface, making it easy to add new rules:
 
-------------------------------------------------------------------------
-
-## 🧠 Core Components
-
-### Package Loader
-
-Uses:
-
--   `golang.org/x/tools/go/packages`
-
-Provides module-aware dependency resolution.
-
-------------------------------------------------------------------------
-
-### AST Analyzer
-
-Uses:
-
--   `go/parser`
--   `go/ast`
--   `go/token`
-
-Responsible for precise import detection and extensibility.
-
-------------------------------------------------------------------------
-
-### Dependency Graph
-
-In-memory directed graph.
-
-Supports:
-
--   DFS cycle detection
--   Layer boundary validation
--   Rule-based traversal
-
-------------------------------------------------------------------------
-
-### Rule Engine
-
-Extensible rule interface:
-
-``` go
+```go
 type Rule interface {
     Name() string
-    Validate(graph *DependencyGraph) []Violation
+    Validate(graph *DependencyGraph, cfg *config.Config) []Violation
 }
 ```
 
-Allows:
+---
 
--   Custom rule injection
--   Plugin evolution
--   Clean separation of concerns
+## Roadmap
 
-------------------------------------------------------------------------
+- [ ] DOT graph export
+- [ ] HTML report
+- [ ] Plugin system
+- [ ] Incremental diff-based analysis
+- [ ] Performance benchmarks
 
-## 🛠 Tech Stack
+---
 
--   Go 1.22+
--   Cobra (CLI framework)
--   Go AST (`go/ast`)
--   go/packages
--   YAML config parsing
--   Table-driven tests
--   GitHub Actions CI
+## License
 
-------------------------------------------------------------------------
-
-## 📊 Design Philosophy
-
-CLnicius is built around:
-
--   Deterministic analysis
--   Extensibility over rigidity
--   Architectural governance as code
--   CI-first mindset
-
-It is not a style linter.\
-It is an architecture guardrail.
-
-------------------------------------------------------------------------
-
-## 🔮 Roadmap
-
--   [ ] DOT graph export
--   [ ] HTML report
--   [ ] Plugin system
--   [ ] Performance benchmarks
--   [ ] Incremental diff-based analysis
-
-------------------------------------------------------------------------
-
-## 🧪 Testing Strategy
-
--   Table-driven tests
--   Golden file output validation
--   Dependency fixture projects
--   Benchmark analysis
-
-------------------------------------------------------------------------
-
-## 📄 License
-
-MIT
+MIT — made by [Vinicius Teixeira](https://github.com/vtbarreto).
