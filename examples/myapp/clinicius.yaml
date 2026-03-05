@@ -1,0 +1,11 @@
+layers:
+  - name: domain
+    path: internal/domain
+    forbid:
+      - internal/infra
+      - internal/repository
+
+  - name: handler
+    path: internal/handler
+    forbid:
+      - internal/repository

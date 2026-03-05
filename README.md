@@ -157,6 +157,79 @@ Standard linters (`golangci-lint`, `staticcheck`) don't catch this. CLinicius do
 
 ---
 
+## Examples
+
+### ✅ Correct structure
+
+Each layer only imports what it's allowed to:
+
+```
+internal/
+├── handler/
+│   └── user_handler.go   → imports domain only
+├── domain/
+│   └── user_service.go   → imports nothing below it
+├── repository/
+│   └── user_repo.go      → imports domain only
+└── infra/
+    └── database.go       → no internal imports
+```
+
+```bash
+$ clinicius check ./...
+
+✅ No architectural violations found.
+```
+
+---
+
+### ❌ Broken structure
+
+`domain` reaches down into `infra` and `repository`. `handler` bypasses the domain and talks directly to `repository`:
+
+```
+internal/
+├── handler/
+│   └── user_handler.go   → imports repository ⚠
+├── domain/
+│   └── user_service.go   → imports infra ⚠ and repository ⚠
+├── repository/
+│   └── user_repo.go
+└── infra/
+    └── database.go
+```
+
+```bash
+$ clinicius check ./...
+
+❌ Architectural Violation
+  Layer:   domain
+  Package: myapp/internal/domain
+  Imports: myapp/internal/infra
+  Rule:    layer-boundary
+  Detail:  domain layer cannot depend on internal/infra
+
+❌ Architectural Violation
+  Layer:   domain
+  Package: myapp/internal/domain
+  Imports: myapp/internal/repository
+  Rule:    layer-boundary
+  Detail:  domain layer cannot depend on internal/repository
+
+❌ Architectural Violation
+  Layer:   handler
+  Package: myapp/internal/handler
+  Imports: myapp/internal/repository
+  Rule:    layer-boundary
+  Detail:  handler layer cannot depend on internal/repository
+
+3 violation(s) found.
+```
+
+A working example of this broken project is available in [`examples/myapp`](./examples/myapp).
+
+---
+
 ## Features
 
 | Feature | Status |
