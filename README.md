@@ -107,6 +107,55 @@ clinicius --help
 
 ## Usage
 
+### `clinicius init` — generate config automatically
+
+Run this first in any Go project. CLinicius scans the directory tree, detects layer folders by name and generates a `clinicius.yaml` with the right rules already set:
+
+```bash
+clinicius init
+```
+
+```
+✅ Generated clinicius.yaml with 4 layer(s) detected:
+
+  handler       internal/handler
+                forbids: internal/repository
+                forbids: internal/infra
+  domain        internal/domain
+                forbids: internal/infra
+                forbids: internal/repository
+                forbids: internal/handler
+  repository    internal/repository
+                forbids: internal/handler
+  infra         internal/infra
+
+--------------------------------------------------
+Review the generated file, then run:
+  clinicius check ./...
+```
+
+Recognized folder names:
+
+| Layer type | Folder names |
+|---|---|
+| handler | `handler`, `handlers`, `controller`, `controllers`, `http`, `rest`, `grpc`, `api` |
+| domain | `domain`, `core`, `model`, `entity`, `entities` |
+| usecase | `usecase`, `usecases`, `service`, `services`, `application` |
+| repository | `repository`, `repositories`, `repo`, `store`, `storage` |
+| infra | `infra`, `infrastructure`, `database`, `db`, `cache`, `queue` |
+
+Additional flags:
+
+```bash
+clinicius init --dry-run                     # preview without writing
+clinicius init --output configs/rules.yaml   # custom output path
+clinicius init --force                       # overwrite existing file
+```
+
+---
+
+### `clinicius check` — run the analysis
+
 ```bash
 # Check all packages in the current module
 clinicius check ./...
@@ -125,7 +174,9 @@ clinicius check ./... --json
 
 ## Configuration
 
-Create a `clinicius.yaml` at the root of your project and declare your layers:
+The `clinicius.yaml` can be generated with `clinicius init` or written manually.
+
+Each layer maps a **path prefix** to a list of **forbidden imports**. Any package whose import path contains `path` that imports something matching a `forbid` entry is reported as a violation.
 
 ```yaml
 layers:
@@ -140,8 +191,6 @@ layers:
     forbid:
       - internal/repository
 ```
-
-Each layer entry maps a **path prefix** to a list of **forbidden imports**. Any package whose import path contains `path` that imports something containing a `forbid` entry is reported as a violation.
 
 ---
 
@@ -234,6 +283,7 @@ A working example of this broken project is available in [`examples/myapp`](./ex
 
 | Feature | Status |
 |---|---|
+| Auto-discovery of layers (`clinicius init`) | ✅ |
 | Layer boundary enforcement | ✅ |
 | Cyclic dependency detection | ✅ |
 | YAML-configurable rules | ✅ |
