@@ -16,7 +16,7 @@ clinicius check ./...
   Rule:    layer-boundary
   Detail:  handler layer cannot depend on internal/repository
 
-1 violation(s) found.
+1 violation found.
 ```
 
 ---
@@ -170,6 +170,37 @@ clinicius check ./... --ci
 clinicius check ./... --json
 ```
 
+### `--lang` — output language
+
+CLinicius auto-detects your language from the OS locale (`LANG` env var). You can override it with a flag or environment variable:
+
+```bash
+# Via flag (highest priority)
+clinicius --lang=pt-BR check ./...
+
+# Via environment variable
+CLINICIUS_LANG=pt-BR clinicius check ./...
+
+# Auto-detected from OS (e.g. LANG=pt_BR.UTF-8)
+clinicius check ./...
+```
+
+Example output in pt-BR:
+
+```
+❌ Violação Arquitetural
+  Camada:  handler
+  Pacote:  myapp/internal/handler
+  Importa: myapp/internal/repository
+  Regra:   layer-boundary
+  Detalhe: handler layer cannot depend on internal/repository
+
+3 violações encontradas.
+```
+
+Supported languages: `en-US` (default), `pt-BR`.
+To add a new language, create `internal/i18n/locales/<tag>.json` — no code changes needed.
+
 ---
 
 ## Configuration
@@ -272,7 +303,7 @@ $ clinicius check ./...
   Rule:    layer-boundary
   Detail:  handler layer cannot depend on internal/repository
 
-3 violation(s) found.
+3 violations found.
 ```
 
 A working example of this broken project is available in [`examples/myapp`](./examples/myapp).
@@ -289,6 +320,7 @@ A working example of this broken project is available in [`examples/myapp`](./ex
 | YAML-configurable rules | ✅ |
 | JSON output | ✅ |
 | CI-friendly exit codes | ✅ |
+| Multilingual output (`en-US`, `pt-BR`) | ✅ |
 | DOT graph export | 🔜 |
 | HTML report | 🔜 |
 | Plugin system | 🔜 |
