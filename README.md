@@ -178,11 +178,29 @@ CLinicius auto-detects your language from the OS locale (`LANG` env var). You ca
 # Via flag (highest priority)
 clinicius --lang=pt-BR check ./...
 
-# Via environment variable
+# Via environment variable (current session only)
 CLINICIUS_LANG=pt-BR clinicius check ./...
 
 # Auto-detected from OS (e.g. LANG=pt_BR.UTF-8)
 clinicius check ./...
+```
+
+To set `CLINICIUS_LANG` permanently:
+
+**Linux / macOS** — add to `~/.bashrc` or `~/.zshrc`:
+```bash
+export CLINICIUS_LANG=pt-BR
+```
+Then reload: `source ~/.bashrc`
+
+**Windows** (PowerShell):
+```powershell
+[System.Environment]::SetEnvironmentVariable("CLINICIUS_LANG", "pt-BR", "User")
+```
+
+To check what language your OS is reporting:
+```bash
+echo $LANG   # e.g. pt_BR.UTF-8 → CLinicius uses pt-BR automatically
 ```
 
 Example output in pt-BR:
