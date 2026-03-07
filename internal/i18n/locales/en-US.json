@@ -1,0 +1,30 @@
+{
+  "NoViolations": {
+    "other": "No architectural violations found."
+  },
+  "ViolationHeader": {
+    "other": "Architectural Violation"
+  },
+  "LabelLayer": {
+    "other": "Layer"
+  },
+  "LabelPackage": {
+    "other": "Package"
+  },
+  "LabelFile": {
+    "other": "File"
+  },
+  "LabelImports": {
+    "other": "Imports"
+  },
+  "LabelRule": {
+    "other": "Rule"
+  },
+  "LabelDetail": {
+    "other": "Detail"
+  },
+  "ViolationCount": {
+    "one": "{{.Count}} violation found.",
+    "other": "{{.Count}} violations found."
+  }
+}

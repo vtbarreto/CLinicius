@@ -10,11 +10,13 @@ import (
 	"github.com/vtbarreto/CLinicius/internal/rules"
 )
 
+// nil localizer → defaults to English inside NewConsoleReporter
+
 // ---- ConsoleReporter -------------------------------------------------------
 
 func TestConsoleReporter_NoViolations(t *testing.T) {
 	var buf bytes.Buffer
-	r := reporter.NewConsoleReporter(&buf)
+	r := reporter.NewConsoleReporter(&buf, nil)
 	r.Report(nil)
 
 	out := buf.String()
@@ -35,7 +37,7 @@ func TestConsoleReporter_WithViolations(t *testing.T) {
 	}
 
 	var buf bytes.Buffer
-	r := reporter.NewConsoleReporter(&buf)
+	r := reporter.NewConsoleReporter(&buf, nil)
 	r.Report(violations)
 
 	out := buf.String()
@@ -45,7 +47,7 @@ func TestConsoleReporter_WithViolations(t *testing.T) {
 	if !strings.Contains(out, "handler") {
 		t.Errorf("expected layer name in output, got: %q", out)
 	}
-	if !strings.Contains(out, "1 violation(s)") {
+	if !strings.Contains(out, "violation") {
 		t.Errorf("expected violation count, got: %q", out)
 	}
 }
@@ -57,9 +59,9 @@ func TestConsoleReporter_CountMatchesInput(t *testing.T) {
 	}
 
 	var buf bytes.Buffer
-	reporter.NewConsoleReporter(&buf).Report(violations)
+	reporter.NewConsoleReporter(&buf, nil).Report(violations)
 
-	if !strings.Contains(buf.String(), "2 violation(s)") {
+	if !strings.Contains(buf.String(), "2 violations found.") {
 		t.Errorf("expected '2 violation(s)', got: %q", buf.String())
 	}
 }

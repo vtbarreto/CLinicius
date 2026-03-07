@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/vtbarreto/CLinicius/internal/analyzer"
 	"github.com/vtbarreto/CLinicius/internal/config"
+	"github.com/vtbarreto/CLinicius/internal/i18n"
 	"github.com/vtbarreto/CLinicius/internal/reporter"
 	"github.com/vtbarreto/CLinicius/internal/rules"
 )
@@ -63,7 +64,8 @@ func runCheck(_ *cobra.Command, args []string) error {
 			return err
 		}
 	} else {
-		reporter.NewConsoleReporter(os.Stdout).Report(violations)
+		loc := i18n.NewLocalizer(LangFlag)
+		reporter.NewConsoleReporter(os.Stdout, loc).Report(violations)
 	}
 
 	if ciMode && len(violations) > 0 {

@@ -1,0 +1,30 @@
+{
+  "NoViolations": {
+    "other": "Nenhuma violação arquitetural encontrada."
+  },
+  "ViolationHeader": {
+    "other": "Violação Arquitetural"
+  },
+  "LabelLayer": {
+    "other": "Camada"
+  },
+  "LabelPackage": {
+    "other": "Pacote"
+  },
+  "LabelFile": {
+    "other": "Arquivo"
+  },
+  "LabelImports": {
+    "other": "Importa"
+  },
+  "LabelRule": {
+    "other": "Regra"
+  },
+  "LabelDetail": {
+    "other": "Detalhe"
+  },
+  "ViolationCount": {
+    "one": "{{.Count}} violação encontrada.",
+    "other": "{{.Count}} violações encontradas."
+  }
+}
