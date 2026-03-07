@@ -1,7 +1,7 @@
 # CLinicius
 
 <p align="center">
-  <img src="assets/logo.png" alt="CLinicius logo" width="160"/>
+  <img src="assets/logo.png" alt="CLinicius logo" width="160" style="border-radius: 50%;"/>
 </p>
 
 > Architectural governance CLI for Go projects.
