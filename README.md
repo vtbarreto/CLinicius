@@ -384,4 +384,4 @@ type Rule interface {
 
 ## License
 
-MIT — made by [Vinicius Teixeira](https://github.com/vtbarreto).
+GPL v3 — made by [Vinicius Teixeira](https://github.com/vtbarreto).

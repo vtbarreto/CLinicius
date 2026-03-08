@@ -371,4 +371,6 @@ type Rule interface {
 
 ## Licença
 
-MIT — feito por [Vinicius Teixeira](https://github.com/vtbarreto).
+GPL v3 — feito por [Vinicius Teixeira](https://github.com/vtbarreto).
+
+Uso livre para estudo e contribuição. Redistribuição comercial exige manter o código aberto sob a mesma licença. Veja [LICENSE](LICENSE) para os termos completos.
