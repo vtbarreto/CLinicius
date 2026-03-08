@@ -4,6 +4,10 @@
   <img src="assets/logo.png" alt="CLinicius logo" width="160" style="border-radius: 50%;"/>
 </p>
 
+<p align="center">
+  <a href="README.pt-BR.md">🇧🇷 Português</a>
+</p>
+
 > Architectural governance CLI for Go projects.
 
 CLinicius enforces layer boundaries and detects cyclic dependencies in Go codebases — the things most linters quietly ignore.
